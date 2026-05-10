@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Achyuttam Bakshi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root { --bg: #ececec; --black: #0a0a0a; --grey: #999; --border: #c8c8c8; --font: 'Inter', Arial, sans-serif; }
+    html, body { height: 100%; width: 100%; }
+    body { font-family: var(--font); background: var(--bg); color: var(--black); -webkit-font-smoothing: antialiased; overscroll-behavior: none; }
+    #gate { position: fixed; inset: 0; background: var(--bg); display: flex; align-items: center; justify-content: center; z-index: 100; animation: fadeIn 0.6s ease both; }
+    .gate-inner { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+    .gate-label { font-size: 11px; font-weight: 700; letter-spacing: 0.25em; color: var(--grey); text-transform: uppercase; animation: slideUp 0.5s 0.2s ease both; opacity: 0; }
+    .gate-form { display: flex; flex-direction: column; animation: slideUp 0.5s 0.35s ease both; opacity: 0; }
+    #pw-input { display: block; width: 220px; border: 1.5px solid var(--black); background: transparent; font-family: var(--font); font-size: 22px; font-weight: 900; letter-spacing: 0.35em; text-align: center; padding: 10px 16px; outline: none; color: var(--black); transition: border-color 0.2s; }
+    #pw-input:focus { border-color: var(--black); }
+    .gate-btn { display: block; width: 220px; background: var(--black); color: var(--bg); border: none; font-family: var(--font); font-size: 11px; font-weight: 700; letter-spacing: 0.25em; padding: 12px; cursor: pointer; text-transform: uppercase; transition: opacity 0.2s; }
+    .gate-btn:hover { opacity: 0.75; }
+    #gate-error { font-size: 12px; font-weight: 700; letter-spacing: 0.2em; color: #c00; text-transform: uppercase; opacity: 0; transition: opacity 0.25s; min-height: 18px; }
+    #gate-error.show { opacity: 1; }
+    @keyframes shake { 0%,100%{transform:translateX(0)} 15%{transform:translateX(-8px)} 30%{transform:translateX(8px)} 45%{transform:translateX(-6px)} 60%{transform:translateX(6px)} 75%{transform:translateX(-3px)} 90%{transform:translateX(3px)} }
+    .shake { animation: shake 0.45s ease; }
+    #site { display: none; width: 100%; min-height: 100vh; overflow-y: auto; overflow-x: hidden; padding: 0 28px 40px; flex-direction: column; scroll-behavior: smooth; }
+    #site.visible { display: flex; animation: fadeIn 0.7s ease both; }
+    #site::-webkit-scrollbar { width: 3px; }
+    #site::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    .header { display: flex; justify-content: space-between; align-items: baseline; padding: 18px 0 0; position: sticky; top: 0; z-index: 10; background: var(--bg); }
+    .header-left, .header-right { font-size: 11px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; }
+    .header-center { font-size: 11px; font-weight: 900; letter-spacing: 0.18em; text-transform: uppercase; }
+    .hero { text-align: center; padding: 20px 0 16px; }
+    .hero-text { font-size: clamp(52px, 9vw, 110px); font-weight: 900; line-height: 1; letter-spacing: -0.02em; text-transform: uppercase; user-select: none; }
+    .content-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 20px; flex: 1; min-height: 0; margin-top: 4px; }
+    .col-left, .col-right { display: flex; flex-direction: column; gap: 12px; min-height: 0; }
+    .media-box { border: 1.5px solid var(--border); background: #fff; overflow: hidden; position: relative; transition: transform 0.35s cubic-bezier(0.22,1,0.36,1), box-shadow 0.35s; }
+    .media-box:hover { transform: translateY(-3px); box-shadow: 0 8px 28px rgba(0,0,0,0.09); }
+    .portrait-box { flex: 1; min-height: clamp(560px, 70vh, 780px); flex-shrink: 0; }
+    .portrait-img { width: 100%; height: 100%; object-fit: cover; object-position: top center; display: block; filter: grayscale(12%) contrast(1.05); transition: filter 0.4s; }
+    .portrait-box:hover .portrait-img { filter: grayscale(0%) contrast(1.08); }
+    .gif-box { flex-shrink: 0; height: clamp(180px, 26vh, 280px); }
+    .gif-img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .quotes-box { padding: 18px 20px; flex-shrink: 0; min-height: clamp(130px, 18vh, 200px); }
+    .quotes-list { list-style: none; display: flex; flex-direction: column; gap: 10px; }
+    .quote-item { font-size: clamp(11px, 1.15vw, 13px); font-weight: 700; line-height: 1.45; letter-spacing: 0.01em; display: flex; gap: 6px; align-items: flex-start; }
+    .quote-bullet { flex-shrink: 0; margin-top: 1px; }
+    .playlist-box { flex: 1; min-height: 100px; max-height: clamp(100px, 15vh, 190px); border: 1.5px solid var(--border); background: #000; }
+    .spotify-iframe { width: 100%; height: 100%; border: none; display: block; }
+    .caption { font-size: 10px; font-weight: 400; letter-spacing: 0.06em; color: var(--grey); margin-top: 5px; padding-left: 2px; }
+    .bottom-text { font-style: italic; font-size: clamp(9px, 1.1vw, 11px); color: var(--grey); text-align: center; margin-top: 12px; line-height: 1.5; letter-spacing: 0.05em; }
+    .reveal { opacity: 0; transform: translateY(28px); transition: opacity 0.65s cubic-bezier(0.22,1,0.36,1), transform 0.65s cubic-bezier(0.22,1,0.36,1); }
+    .reveal.in-view { opacity: 1; transform: translateY(0); }
+    .reveal-delay-1 { transition-delay: 0.05s; }
+    .reveal-delay-2 { transition-delay: 0.15s; }
+    .reveal-delay-3 { transition-delay: 0.10s; }
+    .reveal-delay-4 { transition-delay: 0.20s; }
+    .reveal-delay-5 { transition-delay: 0.25s; }
+    @keyframes fadeIn { from{opacity:0} to{opacity:1} }
+    @keyframes slideUp { from{opacity:0;transform:translateY(14px)} to{opacity:1;transform:translateY(0)} }
+    @media (max-width: 700px) {
+      #site { padding: 0 16px 48px; }
+      .hero-text { font-size: clamp(54px, 18vw, 80px); padding: 16px 0 12px; }
+      .content-grid { grid-template-columns: 1fr; gap: 14px; margin-top: 8px; }
+      .portrait-box { min-height: 320px; }
+      .gif-box { height: 160px; }
+      .quotes-box { min-height: auto; padding: 16px; }
+      .playlist-box { max-height: 140px; }
+      .bottom-text { font-size: 11px; margin-top: 16px; }
+    }
+    @media (max-width: 420px) {
+      .header-left, .header-right, .header-center { font-size: 9px; letter-spacing: 0.12em; }
+    }
+  </style>
+</head>
+<body>
+
+  <div id="gate">
+    <div class="gate-inner">
+      <p class="gate-label">ENTER PASSWORD</p>
+      <form class="gate-form" id="gate-form">
+        <input type="password" id="pw-input" spellcheck="false" autofocus />
+        <button type="submit" class="gate-btn">ENTER</button>
+      </form>
+      <p id="gate-error">ACCESS DENIED</p>
+    </div>
+  </div>
+
+  <div id="site">
+    <header class="header">
+      <span class="header-left">ACHYUTTAM</span>
+      <span class="header-center">FHRO KING</span>
+      <span class="header-right">BAKSHI</span>
+    </header>
+    <div class="hero">
+      <h1 class="hero-text">ITS ABOUT<br>ME !</h1>
+    </div>
+    <div class="content-grid">
+      <div class="col-left">
+        <div class="reveal reveal-delay-1">
+          <div class="media-box portrait-box">
+            <img src="https://kommodo.ai/i/03istlbyYfns620J2tca" alt="Achyuttam" class="portrait-img" />
+          </div>
+          <p class="caption">↳ My picture</p>
+        </div>
+        <div class="reveal reveal-delay-2">
+          <div class="media-box gif-box">
+            <img src="https://media2.giphy.com/media/v1.Y2lkPTZjMDliOTUyZ243ZzFuZHMwcXQ3b2psdGI4a2U1em5ieThqN29kb2o1MW40emQ5byZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/pGCd67ZEnxo7QZzwjJ/giphy.gif" alt="fav gif" class="gif-img" />
+          </div>
+          <p class="caption">↳ My fav gif</p>
+        </div>
+      </div>
+      <div class="col-right">
+        <div class="reveal reveal-delay-3">
+          <div class="media-box quotes-box">
+            <ul class="quotes-list">
+              <li class="quote-item"><span class="quote-bullet">•</span> I don't play the odds. I play the man.</li>
+              <li class="quote-item"><span class="quote-bullet">•</span> I keep a room full of mirrors so I can be surrounded by winners.</li>
+              <li class="quote-item"><span class="quote-bullet">•</span> History is written by the victors.</li>
+              <li class="quote-item"><span class="quote-bullet">•</span> The word impossible exists only in the dictionary of losers.</li>
+            </ul>
+          </div>
+          <p class="caption">↳ quotes I like</p>
+        </div>
+        <div class="reveal reveal-delay-4">
+          <div class="media-box playlist-box">
+            <iframe title="Spotify Playlist"
+              src="https://open.spotify.com/embed/playlist/6PSil3etE2XmR1tbPUa7ny?utm_source=generator&theme=0"
+              allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+              loading="lazy" class="spotify-iframe"></iframe>
+          </div>
+          <p class="caption">↳ My fav playlist</p>
+        </div>
+      </div>
+    </div>
+    <div class="reveal reveal-delay-5">
+      <p class="bottom-text">THIS GUY !! YES THIS GUY IS JUST CRAZY AND SO MUCH CHALANT</p>
+    </div>
+  </div>
+
+  <script>
+    const form = document.getElementById('gate-form');
+    const input = document.getElementById('pw-input');
+    const gate = document.getElementById('gate');
+    const site = document.getElementById('site');
+    const error = document.getElementById('gate-error');
+
+    form.addEventListener('submit', function(e) {
+      e.preventDefault();
+      if (input.value.trim().toUpperCase() === 'TJS4') {
+        gate.style.transition = 'opacity 0.6s ease';
+        gate.style.opacity = '0';
+        setTimeout(() => { gate.style.display = 'none'; site.classList.add('visible'); initScrollReveal(); }, 600);
+      } else {
+        error.classList.add('show');
+        input.classList.add('shake');
+        setTimeout(() => input.classList.remove('shake'), 500);
+        setTimeout(() => error.classList.remove('show'), 2000);
+      }
+    });
+
+    function initScrollReveal() {
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(e => e.isIntersecting ? e.target.classList.add('in-view') : e.target.classList.remove('in-view'));
+      }, { threshold: 0.08 });
+      document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+      const hero = document.querySelector('.hero-text');
+      hero.style.cssText = 'opacity:0;transform:translateY(40px);transition:opacity 0.8s cubic-bezier(0.22,1,0.36,1),transform 0.8s cubic-bezier(0.22,1,0.36,1)';
+      setTimeout(() => { hero.style.opacity='1'; hero.style.transform='translateY(0)'; }, 150);
+      const siteEl = document.getElementById('site');
+      const header = document.querySelector('.header');
+      siteEl.addEventListener('scroll', () => { header.style.transform = `translateY(${-siteEl.scrollTop * 0.02}px)`; });
+    }
+  </script>
+</body>
+</html>
